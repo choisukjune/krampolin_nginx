@@ -1,0 +1,87 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test-pvc
+  name: test-pvc
+spec:
+  replicas: 3
+  minReadySeconds: 0
+  selector:
+    matchLabels:
+      app: test-pvc
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: test-pvc
+    spec:
+      securityContext:
+        supplementalGroups:
+        - 100
+        fsGroup: 100
+      containers:
+        - image: nginx
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          name: test-pvc
+          volumeMounts:
+            - mountPath: /tmp/storage
+              name: test-pvc
+      volumes:
+        - name: test-pvc
+          persistentVolumeClaim:
+            claimName: test-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels:
+    app: test-pvc
+spec:
+  type: LoadBalancer
+  selector:
+    app: test-pvc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  labels:
+    app.kubernetes.io/managed-by: kargocd
+  name: test-pvc
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              serviceName: test-pvc
+              servicePort: 80
+            # 여러분의 app path 를 넣어주세요.
+            path: /k4b87b24b947ba(/|$)(.*)
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
