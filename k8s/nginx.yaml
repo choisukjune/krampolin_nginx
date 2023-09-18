@@ -71,7 +71,7 @@ spec:
               serviceName: test-pvc
               servicePort: 80
             # 여러분의 app path 를 넣어주세요.
-            path: /k4b87b24b947ba(/|$)(.*)
+            path: /kc734370dff47a(/|$)(.*)
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
