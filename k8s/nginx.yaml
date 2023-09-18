@@ -3,14 +3,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: test-pvc
-  name: test-pvc
+    app: fontend
+  name: fontend
 spec:
   replicas: 3
   minReadySeconds: 0
   selector:
     matchLabels:
-      app: test-pvc
+      app: fontend
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -19,7 +19,7 @@ spec:
   template:
     metadata:
       labels:
-        app: test-pvc
+        app: fontend
     spec:
       securityContext:
         supplementalGroups:
@@ -30,25 +30,25 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          name: test-pvc
+          name: fontend
           volumeMounts:
             - mountPath: /tmp/storage
-              name: test-pvc
+              name: fontend
       volumes:
-        - name: test-pvc
+        - name: fontend
           persistentVolumeClaim:
             claimName: test-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-service
+  name: fontend
   labels:
-    app: test-pvc
+    app: fontend
 spec:
   type: LoadBalancer
   selector:
-    app: test-pvc
+    app: fontend
   ports:
     - protocol: TCP
       port: 80
@@ -62,21 +62,21 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
   labels:
     app.kubernetes.io/managed-by: kargocd
-  name: test-pvc
+  name: fontend
 spec:
   rules:
     - http:
         paths:
           - backend:
-              serviceName: test-pvc
+              serviceName: fontend
               servicePort: 80
             # 여러분의 app path 를 넣어주세요.
-            path: /kc734370dff47a(/|$)(.*)
+            path: /k065053a4cfdaa(/|$)(.*)
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: test-pvc
+  name: fontend
   namespace: default
 spec:
   accessModes:
